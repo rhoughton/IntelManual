@@ -1,0 +1,281 @@
+
+Pt1 pg63 
+Objective: What is in the Intel Manual? Starting with MODES!
+ What are the three operating modes of a 32 chip? Are they all responsible for determining access?
+What is the default mode when powering up? Which mode is the most flexible? 
+What is APIC? 
+What allows a 64 chip the ability to run old 32 bit code? *legacy code using virtual 8086 still won’t work
+What is Physical Address Extensions used for? 
+What two submodes exist for 64 bit? 
+What does 64 bit mode actually do?
+Stopped @ pg. 64 right at 3.2 Overview ...Exe Env 
+Summary: 3 operating modes in a 32 chip but when we move to 64 bit there are two additional sub modes. REX prefix?
+Objectives: What is inside the Intel Manual? 
+P. 64, 3.2 Overview of the Basic Exe Env
+In a 64 bit chip you have 4 modes, what are they?
+How often is extended physical addressing used in programs? 
+What are the names of the basic execution registers? (Hint* 8___, 6___, the ___, the___)
+ What are x84 FPU registers used for? 
+What is a packed byte?
+How many bytes doubleword? 
+Stopped at pg. 66 
+Today I learned there are a lot of registers that make up the Intel chip, I had a good idea of the basic registers but the floating point ones are new to me and then quite a few registers after that are new! At least I should be able to remember FPU stands for floating point unit. 
+
+pt3 Obj: Describe the registers used to support the OS
+Questions
+Where is the “stack?”
+What do the control registers determine? 
+What type of registers specify the location of data structures? (protected mode) 
+What is a memory type? 
+What type of registers are inaccessible to applications?
+What register detects/reports hardware errors?
+
+4 Obj: Differences between 32/64 registers (basic exe environment) 
+What’s the first difference you see? (diagram)
+What’s different about the address space in a 64 bit?
+How many general purpose registers are there?
+What is an SIMD operation?
+What is the xsave feature set? 
+What is the name of the new control register? 
+What is a descriptor table?
+
+5. Objective: Explain how memory is organized in a cpu.
+Questions
+What type of address space does the Flat Memory model use? What is contained in this space? 
+What is the reason for using segmented memory? 
+What is the real-address mode model used for?
+What happens when a direct mapping occurs? 
+What is paging? 
+Physical address space vs Linear address space? 
+
+Part 6 Obj: Explain what Extended Physical Addressing is used for. Pg 71
+What mode do you need to be in to use PAE? 
+What is PAE & what is it good for? 
+ What was a trick Intel used before PAE? 
+What processor was the first to use PAE? 
+
+Pt 7 Obj: Describe address and operand size. Pg. 72
+What is an “executive?” 
+What does flat address space imply?
+What makes a linear address = effective address?
+What is an effective address? (section 3.3.7, 2nd paragraph, 3rd sentence)
+How many bytes are in 32 bits? 
+How can you override the default address/operand size a program uses?
+PAE can turn 4GBs of RAM (physical memory) into how much, max? 
+In flat address space, what are linear address equal to? 
+What is involved in address calculation? 
+*description I added to the youtube video:
+The theoretical memory limits in 16, 32 and 64 bit machines are as follows:
+16 bit = 65, 536 bytes (64 Kilobytes)
+32 bit = 4, 294, 967, 295 bytes (4 Gigabytes)
+64 bit = 18, 446, 744, 073, 709, 551, 616 (16 Exabytes)
+In DOS / Windows 3.11 days 16 bit memory could be separated into segments, so that a 16 bit machine could access a greater amount of memory than 64 Kilobytes. When 32 bit chips came out, something was eventually done to increase it’s access size, this something was Extended Physical Addressing (aka PAE, which confused me at first because ...EPA would be the acronym but whatever). Apparently Windows charged extra for a person to utilize PAE but, like Windows often seems to do, changed completely. In fact Windows 8 requires a PAE capable CPU in it's minimum requirements.
+Pt 8 Obj: Describe what the Intel Manual says about Canonical Addressing. P72
+How do we know if a computer is using canonical addressing? 
+What use the SS register?
+When is a SS segment override ignored? 
+How did Multics treat files?
+Start with AMD paragraph
+Which two registers purpose depend on the OS?
+*Bit order is only meaningful when bits are serialized, for example via a serial or SPI or I2C bus but most of the time they are not. @ the cpu level like I am reading here, those bits are in the order we are all used to. I spent hours making sure, b/c in a linuxjournal.com article I read that bit order follows byte order but this really disturbed me until I found this answer on stack exchange: “The order of bits inside a Byte does not make sense, bits inside a byte are not addressable so you can't define an order of this bits to use it as a reference for a definition of endianness. Unlike bits, bytes are addressable, so there is an address order that we can use as a reference to define what does little or big endian mean.” …”by definition Left shift has the same effect as multiplication by 2”
+
+Also, I spent hours on these 5 paragraphs in the manual eventually write this answer on stackoverflow: Like user3386109, said section 3.3.7.1 covers this with 5 (difficult to digest) paragraphs, for me it's page 74 on the 4 volume set you can download from Intel site or go directly here: https://software.intel.com/sites/default/files/managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf 
+
+What these paragraphs are saying is a canonical address is anything less than a full 64 bit address. There are different implementations of addressing such as 48 bit or 56 bit. 
+
+A 48-bit implementation would have a high half canonical address starting at 
+0xFFFF800000000000 
+while the lower half would be 
+0x00007FFFFFFFFFFF
+Like the manual says, bit 63 to whatever will signify it as a canonical address if you see all ones or all zeros. In a 56 bit implementation I immediately know I'm looking at a canonical address when I see 0xFF____ or 0x00____. 
+
+Maybe a helpful way to remember this is the word canonical itself means relating to a general rule, or way of doing something. I just think to myself Intel used to address using less than 64 bits so... that makes sense. Also if something is according to canon like in Star Trek or comic books, it's the way things were seen or done originally. 
+
+Now to answer WHY we have canonical addresses? No one will need to address up to 16 Exabytes (the theoretical limit of a 64 bit machine) so the second paragraph of that manual just says Intel architecture "defines" a 64 bit linear address but it looks like no one will use it. Now just in case, the third paragraph says the implementation will still check those first few bits and if NOT in canonical form, to generate a "general-protection" exception.
+https://stackoverflow.com/questions/25852367/canonical-address/55784732#55784732 
+Pt 9 Describe what the Intel Manual says about Basic Program Execution Registers
+*note* I’ll try to just stick to the manual! Only field trips for pictures! Pg 73
+How many registers are for “basic execution?”
+What 4 categories can we place these registers in?
+What size is the Instruction Pointer? (EIP)
+What is a logical operation?
+Are address calculations all about taking the segment register and adding it to an offset to determine the pointer? (just askin)
+Which registers hold string instructions? 
+Where does the EBX register usually point to?
+What is stored in the accumulator? What’s the name of the accumulator register?
+How does an I/O pointer work? (just askin)
+How do you access the lower two bytes of these general purpose registers? (You reference…)
+
+Pt 10 woo-hoo we made it! 
+Describe what the Intel Manual says about General Purpose registers in 64 bit mode.
+Does the number of registers change from 32 to 64 bit?
+What is the default operand size?
+What registers are available in 64 bit mode?
+What is a signal you are working with a 32 bit operand size while being on a 64  bit machine/application?
+What prefix do you use to generate a 64 bit operand?
+What is real mode? (just askin) 
+What is the problem between switching between 64 and 32?
+
+Pt 11 Describe what the Intel Manual says about Segment Registers
+Do we have segmented memory anymore? What do we use instead?
+How do you access memory in a particular segment?
+What would system code be? (just askin)
+What is the limit of segments in linear address space?
+Can you better explain how segments overlap in linear address space? 
+Where does the processor fetch instructions from?
+What is a logical address? (just askin) 
+Which register is used in conjunction with CS?
+What are examples of “program control?” 
+What went into the choice to only allow 4 data segments?
+ What did you learn about segment registers? 
+EIP is a Basic Program Execution register.
+
+As an exploit target, I think pg. 81 of the Intel manual says it all 
+
+> The EIP register cannot be accessed directly by software; it is controlled implicitly by control-transfer instructions 
+(such as JMP, Jcc, CALL, and RET), interrupts, and exceptions. The only way to read the EIP register is to execute a CALL instruction 
+and then read the value of the return instruction pointer from the procedure stack. The EIP register can be loaded indirectly by 
+modifying the value of a return instruction pointer on the procedure stack and executing a return instruction
+
+Understanding the role EIP plays in program execution seems simple yet complex when you consider the combination of the Code Segment
+register (CS) with EIP creates this "logical address" and because all x86 CPUs use prefetching, an instruction read from the bus won't
+be what's in the EIP register. The simple part is that value in EIP is what's loaded next. 
+and in benign code?
+
+Pt 12 Obj: Describe what the Intel Manual says about the EFLAGS register.
+P.77
+ What creates a flat address space? 
+What is an example of an OS data structure? 
+What are additional base registers for? (just askin) 
+What are limit checks? (just askin)
+What is a “segment access assists?” (just askin)
+What is the EAX register used for? 
+What types of flags are there in the EFLAGS register?
+What is the binary value of this register at startup? 
+What two places store values from EFLAGS?
+
+Pt 13 Obj: Describe what the Intel Manual says about Status Flags pg. 78
+What does the carry flag do?
+What is parity?
+What’s an auxiliary carry flag?
+What’s a zero and sign flag? 
+What is binary-coded decimal arithmetic? (BCD)
+When will an overflow flag trigger?
+What do status flags tell us? 
+What is an out-of-range condition?
+Which flag hands positive numbers? Which negative?
+When do programmers use “multiple precision?” (just askin)
+Which instructions relate to status flags?
+
+Pt 14 Obj: Describe what the Intel Manual says about System Flags. Pg. 79
+What do the system flags control?
+What IOPL field?
+What shouldn’t be touched by application programs?
+What is a maskable interrupt? (just askin?)
+Which two flags relate to debugging?
+
+Pt 15 Obj: Describe what the Intel Manual says about the Instruction Pointer. Pg.80
+ What does EIP stand for? (32bit)
+What is tricky about the EIP register?
+Why is this register absolutely necessary?
+What segment would this register be concerned with?
+Forgive my brevity in this lesson but this lesson led me to contribute to https://security.stackexchange.com/questions/129499/what-does-eip-stand-for/207861#207861 
+Pt 16 Obj: Describe what the Intel Manual says about operand & address size attributes.
+Pg. 80
+ What size are operands and addresses when the D flag is 1?
+ How many bits can operands be in real mode? Protected mode?
+What two sizes can an address be?
+Can you override these sizes?
+What prefix would you use to override an operand? An address? What would the D flag need to be set to in both circumstances?
+
+Pt 17 Obj: Describe what the Intel Manual says about Operand Addressing.
+Questions pg 83
+What’s the difference between operand size in 64 vs 32 bit modes? 
+ What  can be applied on an instruction-by-instruction basis?
+What is the operand size by default in 64 bit mode?
+What prefix would you use to increase operand size?
+ What’s mandatory for opcode extensions?
+ What is an immediate operand?
+What’s the general max a source can have?
+What is an example of a system instruction?
+What instruction uses the contents of EFLAGS?
+L Flag = 1
+No matter what, if this is lit, the smallest an addr can be is 32, the absolute smallest when using 64bit mode.
+----
+Practice Template
+REX.W prefix =
+Op. Size prefix (66h) =
+Addr. Size prefix (67h) = 
+What is the effective operand size?
+What is the effective address size?
+----example----
+REX.W prefix = 0
+Op. Size prefix (66h) =y
+Addr. Size prefix (67h) = y
+What is the effective operand size? 16
+What is the effective address size? 32
+
+Pt 18 Obj: Describe what the Intel Manual says about Memory Operands
+Questions pg 85
+What makes up an operand?
+What is an offset?
+Which is the most common way to specify a segment?
+Narrate this assembly code mov ES:[EBX], EAX
+What determines the effects of segmentation? 
+When is linear address the same as effective address?
+Calculations are used to determine what type of address?
+
+Pt 19 Obj: Describe what the Intel Manual says about Specifying Offsets
+Questions pg 86
+ How can we determine an offset?
+What’s an effective address?
+What happens when ESP or EBP are used as a base? 
+What types of addressing modes are there?
+What is a scalar operand?
+What is an absolute or static address?
+What types of data can be found in a base address?
+To access a record, what’s in the base register?
+What is a procedure activation record?
+What happens when a procedure is entered?
+What two calculation options change when moving to 64 bit mode?
+What does it mean to sign-extend?
+What is RIP relative addressing?
+Answers
+You can do a calculation using these values base, index, displacement, scale factor or if you specify the offset directly in which case we call this a displacement. You can use displacement in a calculation to create a new offset! 
+An effective address is the resulting address we get from an offset. 
+There is displacement, base plus displacement, index*scale plus displacement, base + index + displacement, or base + index*scale + displacement.
+An absolute address is the displacement value that exists after this operand is placed in memory.
+
+Pt.20 Assembler & Compiler Addressing
+Questions
+What can one find in an instruction? (machine-code level)
+Do compilers go from source code to assembly to machine code?
+What is a programming language construct? (google wiki & stack)
+What is i/o port addressing useful for? 
+https://stackoverflow.com/questions/14039843/does-a-compiler-always-produce-an-assembly-code 
+Answers
+Address
+Compilers SHOULD go to asm in case of the need to debug, GCC does :) 
+interpreter : compiler :: compiler : assembler
+Pt 21 -Fundamental Data Types- 
+What are the 5 fundamental data types?
+Do data types need to respect natural boundaries?
+Why should natural boundaries be used?
+When will a general-protection exception occur?
+What happens when the memory bus needs to access unaligned data?
+What happens when addresses are not divisible by an even number?
+
+Streaming SIMD Extensions (SSE)
+-designed in 1999 and is simply move instructions! >>>>>>> yay! 
+Single Precision
+Double Precision
+32 bits
+64 bits
+
+Pt 22 Reading Memory
+How does memory work?
+What is an offset?
+What is a base address?
+What does “HELLO” look like in hexadecimal? 
+What’s the difference between little and big endian?
+Why would a processor use one type of endianness over the other?
